@@ -1,5 +1,6 @@
 import { useState } from "react"
 import TransactionRow from "../components/transactions/TransactionRow"
+import { fmtDec } from "../utils/formatters"
 
 const FILTERS = { all: "Todos", income: "Ingresos", expense: "Gastos" }
 
@@ -10,18 +11,41 @@ export default function Transactions({ transactions, onDelete }) {
 
   return (
     <div className="fade-up">
-      <div className="flex justify-between items-center mb-5">
+      <div className="flex flex-wrap justify-between items-center gap-3 mb-5">
         <h2 className="text-xl font-bold">Transacciones</h2>
         <div className="flex gap-2">
           {Object.entries(FILTERS).map(([key, label]) => (
             <button key={key} onClick={() => setFilter(key)}
-              className={`px-4 py-1.5 rounded-lg text-sm border transition-all ${
+              className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm border transition-all ${
                 filter === key ? "border-accent text-accent bg-accent/10" : "border-border text-muted hover:text-text"
               }`}>{label}</button>
           ))}
         </div>
       </div>
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+
+      {/* Mobile: card list */}
+      <div className="sm:hidden bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
+        {filtered.length === 0
+          ? <p className="px-4 py-12 text-center text-muted text-sm">No hay transacciones todavía.</p>
+          : filtered.map((t) => (
+            <div key={t.id} className="flex items-center justify-between px-4 py-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{t.description}</p>
+                <p className="text-xs text-muted mt-0.5">{t.date} · {t.category}</p>
+              </div>
+              <div className="flex items-center gap-3 ml-3 shrink-0">
+                <span className={`text-sm font-mono font-semibold ${t.type === "income" ? "text-income" : "text-expense"}`}>
+                  {t.type === "income" ? "+" : ""}{fmtDec(t.amount)}
+                </span>
+                <button onClick={() => onDelete(t.id)} className="text-muted hover:text-expense text-lg leading-none transition-colors">×</button>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      {/* Desktop: table */}
+      <div className="hidden sm:block bg-card border border-border rounded-2xl overflow-hidden">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-surface">

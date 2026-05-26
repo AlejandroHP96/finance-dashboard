@@ -39,7 +39,7 @@ export default function App() {
         onSignOut={signOut}
         userEmail={user.email}
       />
-      <main className="max-w-5xl mx-auto px-8 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-6 sm:px-8 sm:py-8">
         {txLoading
           ? <p className="text-muted text-sm">Cargando transacciones...</p>
           : pages[activeTab]

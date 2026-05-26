@@ -32,7 +32,7 @@ export default function AddTransactionModal({ onClose, onAdd }) {
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-      <div className="bg-card border border-border rounded-2xl p-7 w-[360px]">
+      <div className="bg-card border border-border rounded-2xl p-5 sm:p-7 w-full max-w-sm mx-4">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-base font-semibold">Nueva transacción</h3>
           <button onClick={onClose} className="text-muted hover:text-text text-xl leading-none">×</button>
