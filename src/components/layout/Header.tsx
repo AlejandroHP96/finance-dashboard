@@ -14,7 +14,7 @@ const Header = ({ activeTab, setActiveTab, onAdd, onSignOut, userEmail }: Header
       <div className="flex items-center justify-between h-14">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-black font-bold text-sm">₿</div>
-          <span className="font-bold text-base tracking-tight">finflow</span>
+          <span className="font-bold text-base tracking-tight">Fluxi</span>
           <span className="text-muted text-xs hidden sm:block">personal finance</span>
         </div>
         <nav className="hidden sm:flex gap-1">

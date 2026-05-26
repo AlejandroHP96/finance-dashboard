@@ -53,7 +53,7 @@ const AuthPage = ({ onSignIn, onSignUp }: AuthPageProps) => {
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-3 justify-center mb-10">
           <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-black font-bold text-lg">₿</div>
-          <span className="font-bold text-2xl tracking-tight">finflow</span>
+          <span className="font-bold text-2xl tracking-tight">Fluxi</span>
         </div>
         <div className="bg-card border border-border rounded-2xl p-7">
           <h2 className="text-base font-semibold mb-6">
