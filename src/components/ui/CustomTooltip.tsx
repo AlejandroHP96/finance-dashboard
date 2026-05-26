@@ -1,6 +1,18 @@
 import { fmt } from "../../utils/formatters"
 
-export default function CustomTooltip({ active, payload, label }) {
+interface PayloadEntry {
+  color: string
+  name: string
+  value: number
+}
+
+interface CustomTooltipProps {
+  active?: boolean
+  payload?: PayloadEntry[]
+  label?: string
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-card border border-border rounded-xl px-4 py-3 text-sm">
@@ -11,3 +23,5 @@ export default function CustomTooltip({ active, payload, label }) {
     </div>
   )
 }
+
+export default CustomTooltip

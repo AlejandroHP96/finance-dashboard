@@ -4,17 +4,16 @@ import {
   onSnapshot, addDoc, deleteDoc, doc, serverTimestamp,
 } from "firebase/firestore"
 import { db } from "../lib/firebase"
+import type { Transaction, NewTransaction, Totals } from "../types"
 
-export function useTransactions(userId) {
-  const [transactions, setTransactions] = useState([])
+export const useTransactions = (userId: string | undefined) => {
+  const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading]           = useState(true)
-  const [error, setError]               = useState(null)
+  const [error, setError]               = useState<string | null>(null)
 
   useEffect(() => {
     if (!userId) return
 
-    // Sin orderBy para evitar requerir índice compuesto en Firestore
-    // El orden se gestiona en el cliente
     const q = query(
       collection(db, "transactions"),
       where("userId", "==", userId)
@@ -22,8 +21,8 @@ export function useTransactions(userId) {
 
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs
-        .map((d) => ({ id: d.id, ...d.data() }))
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .map((d) => ({ id: d.id, ...d.data() } as Transaction))
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       setTransactions(data)
       setLoading(false)
     }, (err) => {
@@ -34,7 +33,7 @@ export function useTransactions(userId) {
     return () => unsub()
   }, [userId])
 
-  const addTransaction = async (tx) => {
+  const addTransaction = async (tx: NewTransaction): Promise<boolean> => {
     try {
       await addDoc(collection(db, "transactions"), {
         ...tx,
@@ -43,34 +42,38 @@ export function useTransactions(userId) {
       })
       return true
     } catch (e) {
-      setError(e.message)
+      setError((e as Error).message)
       return false
     }
   }
 
-  const deleteTransaction = async (id) => {
+  const deleteTransaction = async (id: string): Promise<boolean> => {
     try {
       await deleteDoc(doc(db, "transactions", id))
       return true
     } catch (e) {
-      setError(e.message)
+      setError((e as Error).message)
       return false
     }
   }
 
-  const totals = transactions.reduce(
-    (acc, t) => {
-      if (t.type === "income")  acc.income  += Number(t.amount)
-      if (t.type === "expense") acc.expense += Math.abs(Number(t.amount))
-      return acc
+  const acc = transactions.reduce(
+    (a, t) => {
+      if (t.type === "income")  a.income  += Number(t.amount)
+      if (t.type === "expense") a.expense += Math.abs(Number(t.amount))
+      return a
     },
     { income: 0, expense: 0 }
   )
 
-  totals.balance     = totals.income - totals.expense
-  totals.savingsRate = totals.income > 0
-    ? ((totals.balance / totals.income) * 100).toFixed(1)
-    : "0.0"
+  const balance = acc.income - acc.expense
+  const totals: Totals = {
+    ...acc,
+    balance,
+    savingsRate: acc.income > 0
+      ? ((balance / acc.income) * 100).toFixed(1)
+      : "0.0",
+  }
 
   return { transactions, loading, error, addTransaction, deleteTransaction, totals }
 }

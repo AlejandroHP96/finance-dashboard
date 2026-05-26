@@ -3,8 +3,14 @@ import CategoryBar from "../components/ui/CategoryBar"
 import CustomTooltip from "../components/ui/CustomTooltip"
 import { buildMonthlyData, buildCategoryData } from "../utils/formatters"
 import { MONTHS, CAT_COLORS } from "../constants/categories"
+import type { Transaction, Totals } from "../types"
 
-export default function Analytics({ transactions, totals }) {
+interface AnalyticsProps {
+  transactions: Transaction[]
+  totals: Totals
+}
+
+const Analytics = ({ transactions, totals }: AnalyticsProps) => {
   const monthly = buildMonthlyData(transactions, MONTHS)
   const catData = buildCategoryData(transactions)
 
@@ -17,7 +23,7 @@ export default function Analytics({ transactions, totals }) {
           <BarChart data={monthly} barSize={32}>
             <CartesianGrid stroke="#2a2a38" strokeDasharray="4 4" vertical={false} />
             <XAxis dataKey="label" tick={{ fill: "#6b6b80", fontSize: 12 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: "#6b6b80", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}€`} />
+            <YAxis tick={{ fill: "#6b6b80", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${v}€`} />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="savings" name="Ahorro" radius={[6, 6, 0, 0]}>
               {monthly.map((m, i) => <Cell key={i} fill={m.savings >= 0 ? "#60a5fa" : "#f87171"} />)}
@@ -37,3 +43,5 @@ export default function Analytics({ transactions, totals }) {
     </div>
   )
 }
+
+export default Analytics

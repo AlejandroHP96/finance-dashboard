@@ -1,13 +1,21 @@
 import { useState } from "react"
 import TransactionRow from "../components/transactions/TransactionRow"
 import { fmtDec } from "../utils/formatters"
+import type { Transaction } from "../types"
 
-const FILTERS = { all: "Todos", income: "Ingresos", expense: "Gastos" }
+const FILTERS: Record<string, string> = {
+  all: "Todos", income: "Ingresos", expense: "Gastos",
+}
 
-export default function Transactions({ transactions, onDelete }) {
+interface TransactionsProps {
+  transactions: Transaction[]
+  onDelete: (id: string) => Promise<boolean>
+}
+
+const Transactions = ({ transactions, onDelete }: TransactionsProps) => {
   const [filter, setFilter] = useState("all")
   const filtered = (filter === "all" ? transactions : transactions.filter((t) => t.type === filter))
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   return (
     <div className="fade-up">
@@ -49,7 +57,7 @@ export default function Transactions({ transactions, onDelete }) {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-surface">
-              {["Fecha","Descripción","Categoría","Importe",""].map((h, i) => (
+              {["Fecha", "Descripción", "Categoría", "Importe", ""].map((h, i) => (
                 <th key={i} className={`px-4 py-3 text-xs text-muted font-semibold uppercase tracking-wide border-b border-border ${i === 3 ? "text-right" : "text-left"}`}>{h}</th>
               ))}
             </tr>
@@ -65,3 +73,5 @@ export default function Transactions({ transactions, onDelete }) {
     </div>
   )
 }
+
+export default Transactions

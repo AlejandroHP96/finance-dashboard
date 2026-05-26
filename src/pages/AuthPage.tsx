@@ -1,17 +1,26 @@
 import { useState } from "react"
+import type { FirebaseError } from "firebase/app"
+import type { AuthResult } from "../types"
 
-const FIREBASE_ERRORS = {
-  "auth/email-already-in-use":   "Este email ya está registrado.",
-  "auth/invalid-email":          "Email no válido.",
-  "auth/weak-password":          "La contraseña debe tener al menos 6 caracteres.",
-  "auth/user-not-found":         "No existe una cuenta con este email.",
-  "auth/wrong-password":         "Contraseña incorrecta.",
-  "auth/invalid-credential":     "Email o contraseña incorrectos.",
-  "auth/too-many-requests":      "Demasiados intentos. Espera un momento.",
+const FIREBASE_ERRORS: Record<string, string> = {
+  "auth/email-already-in-use":  "Este email ya está registrado.",
+  "auth/invalid-email":         "Email no válido.",
+  "auth/weak-password":         "La contraseña debe tener al menos 6 caracteres.",
+  "auth/user-not-found":        "No existe una cuenta con este email.",
+  "auth/wrong-password":        "Contraseña incorrecta.",
+  "auth/invalid-credential":    "Email o contraseña incorrectos.",
+  "auth/too-many-requests":     "Demasiados intentos. Espera un momento.",
 }
 
-export default function AuthPage({ onSignIn, onSignUp }) {
-  const [mode, setMode]       = useState("login")
+interface AuthPageProps {
+  onSignIn: (email: string, password: string) => Promise<AuthResult>
+  onSignUp: (email: string, password: string) => Promise<AuthResult>
+}
+
+type AuthMode = "login" | "signup"
+
+const AuthPage = ({ onSignIn, onSignUp }: AuthPageProps) => {
+  const [mode, setMode]       = useState<AuthMode>("login")
   const [email, setEmail]     = useState("")
   const [password, setPass]   = useState("")
   const [loading, setLoading] = useState(false)
@@ -24,13 +33,19 @@ export default function AuthPage({ onSignIn, onSignUp }) {
 
     if (mode === "login") {
       const { error } = await onSignIn(email, password)
-      if (error) setErr(FIREBASE_ERRORS[error.code] || error.message)
+      if (error) setErr(FIREBASE_ERRORS[(error as FirebaseError).code] ?? error.message)
     } else {
       const { error } = await onSignUp(email, password)
-      if (error) setErr(FIREBASE_ERRORS[error.code] || error.message)
+      if (error) setErr(FIREBASE_ERRORS[(error as FirebaseError).code] ?? error.message)
       else setMsg("¡Cuenta creada! Ya puedes empezar.")
     }
     setLoading(false)
+  }
+
+  const toggleMode = () => {
+    setMode(mode === "login" ? "signup" : "login")
+    setErr("")
+    setMsg("")
   }
 
   return (
@@ -64,8 +79,7 @@ export default function AuthPage({ onSignIn, onSignUp }) {
           </button>
           <p className="text-center text-xs text-muted">
             {mode === "login" ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
-            <button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setErr(""); setMsg("") }}
-              className="text-accent hover:underline">
+            <button onClick={toggleMode} className="text-accent hover:underline">
               {mode === "login" ? "Regístrate" : "Inicia sesión"}
             </button>
           </p>
@@ -74,3 +88,5 @@ export default function AuthPage({ onSignIn, onSignUp }) {
     </div>
   )
 }
+
+export default AuthPage

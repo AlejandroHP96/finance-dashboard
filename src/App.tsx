@@ -8,7 +8,7 @@ import Transactions from "./pages/Transactions"
 import Analytics from "./pages/Analytics"
 import AuthPage from "./pages/AuthPage"
 
-export default function App() {
+const App = () => {
   const { user, loading: authLoading, signIn, signUp, signOut } = useAuth()
   const { transactions, loading: txLoading, addTransaction, deleteTransaction, totals } = useTransactions(user?.uid)
   const [activeTab, setActiveTab] = useState("overview")
@@ -24,7 +24,7 @@ export default function App() {
 
   if (!user) return <AuthPage onSignIn={signIn} onSignUp={signUp} />
 
-  const pages = {
+  const pages: Record<string, JSX.Element> = {
     overview:     <Overview     transactions={transactions} totals={totals} />,
     transactions: <Transactions transactions={transactions} onDelete={deleteTransaction} />,
     analytics:    <Analytics    transactions={transactions} totals={totals} />,
@@ -49,3 +49,5 @@ export default function App() {
     </div>
   )
 }
+
+export default App

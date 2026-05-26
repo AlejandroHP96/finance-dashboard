@@ -6,11 +6,17 @@ import KpiCard from "../components/ui/KpiCard"
 import CustomTooltip from "../components/ui/CustomTooltip"
 import { fmt, fmtDec, buildMonthlyData, buildCategoryData } from "../utils/formatters"
 import { MONTHS, CAT_COLORS } from "../constants/categories"
+import type { Transaction, Totals } from "../types"
 
-export default function Overview({ transactions, totals }) {
+interface OverviewProps {
+  transactions: Transaction[]
+  totals: Totals
+}
+
+const Overview = ({ transactions, totals }: OverviewProps) => {
   const monthly = buildMonthlyData(transactions, MONTHS)
   const catData = buildCategoryData(transactions)
-  const recent  = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6)
+  const recent  = [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 6)
 
   const kpis = [
     { label: "Balance total",  value: fmt(totals.balance),       sub: "Acumulado",       color: totals.balance >= 0 ? "#4ade80" : "#f87171" },
@@ -41,7 +47,7 @@ export default function Overview({ transactions, totals }) {
             </defs>
             <CartesianGrid stroke="#2a2a38" strokeDasharray="4 4" vertical={false} />
             <XAxis dataKey="label" tick={{ fill: "#6b6b80", fontSize: 12 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: "#6b6b80", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000}k€`} />
+            <YAxis tick={{ fill: "#6b6b80", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${v / 1000}k€`} />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 12, color: "#6b6b80" }} />
             <Area type="monotone" dataKey="income"  name="Ingresos" stroke="#4ade80" strokeWidth={2} fill="url(#gi)" dot={false} />
@@ -59,7 +65,7 @@ export default function Overview({ transactions, totals }) {
                 <Pie data={catData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} dataKey="value" strokeWidth={0}>
                   {catData.map((_, i) => <Cell key={i} fill={CAT_COLORS[i % CAT_COLORS.length]} />)}
                 </Pie>
-                <Tooltip formatter={(v) => fmt(v)} contentStyle={{ background: "#1c1c26", border: "1px solid #2a2a38", borderRadius: 8, fontSize: 12 }} />
+                <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ background: "#1c1c26", border: "1px solid #2a2a38", borderRadius: 8, fontSize: 12 }} />
               </PieChart>
             </ResponsiveContainer>
             <div className="flex-1">
@@ -97,3 +103,5 @@ export default function Overview({ transactions, totals }) {
     </div>
   )
 }
+
+export default Overview

@@ -1,6 +1,13 @@
 import { fmt } from "../../utils/formatters"
 
-export default function CategoryBar({ name, value, total, color }) {
+interface CategoryBarProps {
+  name: string
+  value: number
+  total: number
+  color: string
+}
+
+const CategoryBar = ({ name, value, total, color }: CategoryBarProps) => {
   const pct = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0"
   return (
     <div className="mb-4">
@@ -14,3 +21,5 @@ export default function CategoryBar({ name, value, total, color }) {
     </div>
   )
 }
+
+export default CategoryBar
